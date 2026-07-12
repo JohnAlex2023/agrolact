@@ -1,0 +1,272 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────
+
+enum Rol {
+  ADMINISTRADOR
+  PRESIDENTE
+  RECEPCIONISTA
+  ENCARGADO_TIENDA
+
+  @@map("rol")
+}
+
+enum Jornada {
+  MANANA
+  TARDE
+
+  @@map("jornada")
+}
+
+enum EstadoQuincena {
+  ABIERTA
+  CERRADA
+
+  @@map("estado_quincena")
+}
+
+enum TipoVenta {
+  CONTADO
+  FIADO
+
+  @@map("tipo_venta")
+}
+
+enum AccionAuditoria {
+  INSERT
+  UPDATE
+  DELETE
+
+  @@map("accion_auditoria")
+}
+
+// ─── Seguridad ──────────────────────────────────────────────────────
+
+model Usuario {
+  id           String   @id @default(uuid()) @db.Uuid
+  nombre       String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  rol          Rol
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  quincenasCreadas     Quincena[]        @relation("QuincenaCreadaPor")
+  registrosLeche       RegistroLeche[]   @relation("RegistroLecheRegistradoPor")
+  correccionesLeche    CorreccionLeche[] @relation("CorreccionLecheCorregidoPor")
+  adelantosRegistrados Adelanto[]        @relation("AdelantoRegistradoPor")
+  ventasRegistradas    VentaTienda[]     @relation("VentaTiendaRegistradoPor")
+  gastosRegistrados    GastoOperativo[]  @relation("GastoOperativoRegistradoPor")
+  auditorias           Auditoria[]
+
+  @@map("usuarios")
+}
+
+// ─── Socios ─────────────────────────────────────────────────────────
+
+model Socio {
+  id        String   @id @default(uuid()) @db.Uuid
+  nombres   String
+  cedula    String   @unique
+  celular   String
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  registrosLeche RegistroLeche[]
+  liquidaciones  Liquidacion[]
+  adelantos      Adelanto[]
+  ventasTienda   VentaTienda[]
+
+  @@map("socios")
+}
+
+// ─── Quincenas ──────────────────────────────────────────────────────
+
+model Quincena {
+  id          String         @id @default(uuid()) @db.Uuid
+  fechaInicio DateTime       @map("fecha_inicio") @db.Date
+  fechaFin    DateTime       @map("fecha_fin") @db.Date
+  precioLitro Decimal?       @map("precio_litro") @db.Decimal(10, 2)
+  estado      EstadoQuincena @default(ABIERTA)
+  creadoPor   String         @map("creado_por") @db.Uuid
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  creador          Usuario          @relation("QuincenaCreadaPor", fields: [creadoPor], references: [id])
+  registrosLeche   RegistroLeche[]
+  liquidaciones    Liquidacion[]
+  ventasTienda     VentaTienda[]
+  gastosOperativos GastoOperativo[]
+
+  @@map("quincenas")
+}
+
+// ─── Registro de leche ──────────────────────────────────────────────
+
+model RegistroLeche {
+  id            String   @id @default(uuid()) @db.Uuid
+  socioId       String   @map("socio_id") @db.Uuid
+  quincenaId    String   @map("quincena_id") @db.Uuid
+  fecha         DateTime @db.Date
+  jornada       Jornada
+  litros        Decimal  @db.Decimal(8, 2)
+  registradoPor String   @map("registrado_por") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  socio        Socio             @relation(fields: [socioId], references: [id])
+  quincena     Quincena          @relation(fields: [quincenaId], references: [id])
+  registrador  Usuario           @relation("RegistroLecheRegistradoPor", fields: [registradoPor], references: [id])
+  correcciones CorreccionLeche[]
+
+  @@unique([socioId, fecha, jornada])
+  @@map("registros_leche")
+}
+
+model CorreccionLeche {
+  id            String   @id @default(uuid()) @db.Uuid
+  registroId    String   @map("registro_id") @db.Uuid
+  valorAnterior Decimal  @map("valor_anterior") @db.Decimal(8, 2)
+  valorNuevo    Decimal  @map("valor_nuevo") @db.Decimal(8, 2)
+  observacion   String
+  corregidoPor  String   @map("corregido_por") @db.Uuid
+  corregidoEn   DateTime @default(now()) @map("corregido_en")
+
+  registro RegistroLeche @relation(fields: [registroId], references: [id])
+  usuario  Usuario       @relation("CorreccionLecheCorregidoPor", fields: [corregidoPor], references: [id])
+
+  @@map("correcciones_leche")
+}
+
+// ─── Liquidaciones ──────────────────────────────────────────────────
+
+model Liquidacion {
+  id                 String   @id @default(uuid()) @db.Uuid
+  quincenaId         String   @map("quincena_id") @db.Uuid
+  socioId            String   @map("socio_id") @db.Uuid
+  totalLitros        Decimal  @default(0) @map("total_litros") @db.Decimal(10, 2)
+  valorBruto         Decimal  @default(0) @map("valor_bruto") @db.Decimal(12, 2)
+  descuentoAdelantos Decimal  @default(0) @map("descuento_adelantos") @db.Decimal(12, 2)
+  descuentoFiados    Decimal  @default(0) @map("descuento_fiados") @db.Decimal(12, 2)
+  saldoDeudaAnterior Decimal  @default(0) @map("saldo_deuda_anterior") @db.Decimal(12, 2)
+  netoPagar          Decimal  @default(0) @map("neto_pagar") @db.Decimal(12, 2)
+  saldoNuevo         Decimal  @default(0) @map("saldo_nuevo") @db.Decimal(12, 2)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  quincena Quincena        @relation(fields: [quincenaId], references: [id])
+  socio    Socio           @relation(fields: [socioId], references: [id])
+  abonos   AbonoAdelanto[]
+
+  @@unique([quincenaId, socioId])
+  @@map("liquidaciones")
+}
+
+// ─── Adelantos ──────────────────────────────────────────────────────
+
+model Adelanto {
+  id            String   @id @default(uuid()) @db.Uuid
+  socioId       String   @map("socio_id") @db.Uuid
+  fecha         DateTime @db.Date
+  valor         Decimal  @db.Decimal(12, 2)
+  abonoAcordado Decimal? @map("abono_acordado") @db.Decimal(12, 2)
+  observacion   String?
+  registradoPor String   @map("registrado_por") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  socio       Socio           @relation(fields: [socioId], references: [id])
+  registrador Usuario         @relation("AdelantoRegistradoPor", fields: [registradoPor], references: [id])
+  abonos      AbonoAdelanto[]
+
+  @@map("adelantos")
+}
+
+model AbonoAdelanto {
+  id            String   @id @default(uuid()) @db.Uuid
+  adelantoId    String   @map("adelanto_id") @db.Uuid
+  liquidacionId String   @map("liquidacion_id") @db.Uuid
+  monto         Decimal  @db.Decimal(12, 2)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  adelanto    Adelanto    @relation(fields: [adelantoId], references: [id])
+  liquidacion Liquidacion @relation(fields: [liquidacionId], references: [id])
+
+  @@map("abonos_adelanto")
+}
+
+// ─── Tienda ─────────────────────────────────────────────────────────
+
+model Producto {
+  id           String   @id @default(uuid()) @db.Uuid
+  nombre       String
+  unidadMedida String   @map("unidad_medida")
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  ventas VentaTienda[]
+
+  @@map("productos")
+}
+
+model VentaTienda {
+  id             String    @id @default(uuid()) @db.Uuid
+  socioId        String    @map("socio_id") @db.Uuid
+  quincenaId     String    @map("quincena_id") @db.Uuid
+  productoId     String    @map("producto_id") @db.Uuid
+  tipo           TipoVenta
+  cantidad       Decimal   @db.Decimal(10, 2)
+  precioUnitario Decimal   @map("precio_unitario") @db.Decimal(12, 2)
+  total          Decimal   @db.Decimal(12, 2)
+  descontado     Boolean   @default(false)
+  registradoPor  String    @map("registrado_por") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  socio       Socio    @relation(fields: [socioId], references: [id])
+  quincena    Quincena @relation(fields: [quincenaId], references: [id])
+  producto    Producto @relation(fields: [productoId], references: [id])
+  registrador Usuario  @relation("VentaTiendaRegistradoPor", fields: [registradoPor], references: [id])
+
+  @@map("ventas_tienda")
+}
+
+// ─── Gastos operativos ──────────────────────────────────────────────
+
+model GastoOperativo {
+  id            String   @id @default(uuid()) @db.Uuid
+  quincenaId    String   @map("quincena_id") @db.Uuid
+  concepto      String
+  valor         Decimal  @db.Decimal(12, 2)
+  registradoPor String   @map("registrado_por") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  quincena    Quincena @relation(fields: [quincenaId], references: [id])
+  registrador Usuario  @relation("GastoOperativoRegistradoPor", fields: [registradoPor], references: [id])
+
+  @@map("gastos_operativos")
+}
+
+// ─── Auditoría ──────────────────────────────────────────────────────
+
+model Auditoria {
+  id              String          @id @default(uuid()) @db.Uuid
+  usuarioId       String          @map("usuario_id") @db.Uuid
+  entidad         String
+  registroId      String?         @map("registro_id") @db.Uuid
+  accion          AccionAuditoria
+  datosAnteriores Json?           @map("datos_anteriores") @db.JsonB
+  datosNuevos     Json?           @map("datos_nuevos") @db.JsonB
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@map("auditoria")
+}
