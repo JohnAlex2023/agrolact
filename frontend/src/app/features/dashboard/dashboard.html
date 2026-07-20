@@ -1,0 +1,15 @@
+<div class="dashboard">
+  <header>
+    <h1>AgroLact</h1>
+    @if (authService.usuario(); as usuario) {
+      <div class="usuario-info">
+        <span>{{ usuario.nombre }} &middot; {{ usuario.rol }}</span>
+        <button (click)="cerrarSesion()">Cerrar sesion</button>
+      </div>
+    }
+  </header>
+
+  <main>
+    <p>Bienvenido al sistema de gestion de AgroLact.</p>
+  </main>
+</div>
