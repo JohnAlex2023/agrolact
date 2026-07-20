@@ -1,0 +1,55 @@
+<div class="page">
+  <h1>Gastos operativos</h1>
+  <p class="subtitulo">Se registran contra la quincena abierta actualmente.</p>
+
+  <form class="card" [formGroup]="form" (ngSubmit)="registrar()">
+    <h3>Registrar gasto</h3>
+
+    @if (error()) {
+      <p class="mensaje-error">{{ error() }}</p>
+    }
+    @if (exito()) {
+      <p class="mensaje-ok">{{ exito() }}</p>
+    }
+
+    <div class="grid-form">
+      <div class="field">
+        <label for="concepto">Concepto</label>
+        <input id="concepto" formControlName="concepto" />
+      </div>
+      <div class="field">
+        <label for="valor">Valor</label>
+        <input id="valor" type="number" step="0.01" min="0.01" formControlName="valor" />
+      </div>
+      <button type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando...' : 'Registrar' }}</button>
+    </div>
+  </form>
+
+  <div class="card">
+    <div class="toolbar">
+      <h3>Gastos de la quincena actual</h3>
+      <strong>Total: {{ totalGastos }}</strong>
+    </div>
+
+    @if (gastos().length === 0) {
+      <p class="vacio">No hay gastos registrados en esta quincena (o no hay quincena abierta).</p>
+    } @else {
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (gasto of gastos(); track gasto.id) {
+            <tr>
+              <td>{{ gasto.concepto }}</td>
+              <td>{{ gasto.valor }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

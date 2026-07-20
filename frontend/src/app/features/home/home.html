@@ -1,0 +1,9 @@
+<div class="page">
+  @if (authService.usuario(); as usuario) {
+    <h1>Bienvenido, {{ usuario.nombre }}</h1>
+    <p class="subtitulo">Sistema de gestion de AgroLact &middot; rol: {{ usuario.rol }}</p>
+  }
+  <div class="card">
+    <p>Usa el menu de la izquierda para navegar entre los modulos del sistema.</p>
+  </div>
+</div>

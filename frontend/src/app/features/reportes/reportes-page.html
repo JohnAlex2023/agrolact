@@ -1,0 +1,132 @@
+<div class="page">
+  <h1>Reportes</h1>
+
+  @if (authService.tieneRol('ADMINISTRADOR', 'PRESIDENTE')) {
+    <div class="card">
+      <div class="toolbar">
+        <h3>Produccion por socio (periodo)</h3>
+      </div>
+      <form [formGroup]="formRango" (ngSubmit)="consultarProduccion()" class="grid-form" style="max-width: 30rem;">
+        <div class="field">
+          <label for="desde">Desde</label>
+          <input id="desde" type="date" formControlName="desde" />
+        </div>
+        <div class="field">
+          <label for="hasta">Hasta</label>
+          <input id="hasta" type="date" formControlName="hasta" />
+        </div>
+        <button type="submit">Consultar</button>
+      </form>
+
+      @if (produccionTotal().length === 0) {
+        <p class="vacio">Sin produccion registrada en este periodo.</p>
+      } @else {
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Socio</th>
+              <th>Total litros</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of produccionTotal(); track item.socio_id) {
+              <tr>
+                <td>{{ item.socio.nombres }}</td>
+                <td>{{ item.total_litros }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="card">
+      <h3>Estado de cuenta por socio</h3>
+      <div class="field" style="max-width: 20rem;">
+        <select (change)="consultarEstadoCuenta($any($event.target).value)">
+          <option value="">Selecciona un socio</option>
+          @for (socio of socios(); track socio.id) {
+            <option [value]="socio.id">{{ socio.nombres }}</option>
+          }
+        </select>
+      </div>
+
+      @if (socioEstadoCuenta()) {
+        @if (estadoCuenta().length === 0) {
+          <p class="vacio">Este socio no tiene liquidaciones registradas.</p>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Quincena</th>
+                <th>Litros</th>
+                <th>Neto pagado</th>
+                <th>Saldo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (liq of estadoCuenta(); track liq.id) {
+                <tr>
+                  <td>{{ liq.quincena?.fecha_inicio }} &rarr; {{ liq.quincena?.fecha_fin }}</td>
+                  <td>{{ liq.total_litros }}</td>
+                  <td>{{ liq.neto_pagar }}</td>
+                  <td>{{ liq.saldo_nuevo }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+    </div>
+
+    <div class="card">
+      <h3>Adelantos pendientes (todos los socios)</h3>
+      @if (adelantosPendientes().length === 0) {
+        <p class="vacio">No hay adelantos pendientes.</p>
+      } @else {
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Socio</th>
+              <th>Saldo restante</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (adelanto of adelantosPendientes(); track adelanto.id) {
+              <tr>
+                <td>{{ adelanto.socio?.nombres }}</td>
+                <td><span class="badge pendiente">{{ adelanto.saldo_restante }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+  }
+
+  <div class="card">
+    <h3>Fiados pendientes (todos los socios)</h3>
+    @if (fiadosPendientes().length === 0) {
+      <p class="vacio">No hay fiados pendientes.</p>
+    } @else {
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Socio</th>
+            <th>Producto</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fiado of fiadosPendientes(); track fiado.id) {
+            <tr>
+              <td>{{ fiado.socio?.nombres }}</td>
+              <td>{{ fiado.producto?.nombre }}</td>
+              <td><span class="badge pendiente">{{ fiado.total }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

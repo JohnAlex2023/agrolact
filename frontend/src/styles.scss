@@ -1,1 +1,163 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: #f4f6f4;
+  color: #1f2a24;
+}
+
+h1, h2, h3 {
+  margin: 0 0 1rem;
+  color: #1f4620;
+}
+
+.page {
+  padding: 1.5rem 2rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: white;
+  border-radius: 0.6rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  label {
+    font-size: 0.82rem;
+    color: #444;
+    font-weight: 600;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #ccd3cd;
+    border-radius: 0.4rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+  }
+
+  .campo-error {
+    color: #c0392b;
+    font-size: 0.78rem;
+  }
+}
+
+table.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #e6e9e6;
+  }
+
+  th {
+    color: #4c5a4e;
+    font-weight: 700;
+    background: #eef3ee;
+  }
+
+  tbody tr:hover {
+    background: #f7faf7;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  &.activa { background: #e3f3e3; color: #226b22; }
+  &.cerrada { background: #eee; color: #666; }
+  &.pendiente { background: #fdf1e0; color: #a15c00; }
+}
+
+button, .btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: #2f6d3a;
+  color: white;
+
+  &:hover { background: #275a30; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  &.secundario {
+    background: white;
+    color: #2f6d3a;
+    border: 1px solid #2f6d3a;
+
+    &:hover { background: #eef6ee; }
+  }
+
+  &.peligro {
+    background: #c0392b;
+
+    &:hover { background: #a33224; }
+  }
+}
+
+.mensaje-error {
+  padding: 0.6rem 0.9rem;
+  background: #fdecea;
+  color: #c0392b;
+  border-radius: 0.4rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+.mensaje-ok {
+  padding: 0.6rem 0.9rem;
+  background: #e3f3e3;
+  color: #226b22;
+  border-radius: 0.4rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+.vacio {
+  color: #888;
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+.subtitulo {
+  color: #666;
+  margin: -0.5rem 0 1.25rem;
+}
