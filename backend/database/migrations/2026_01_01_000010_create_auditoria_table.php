@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('auditoria', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('usuario_id')->constrained('usuarios');
+            $table->string('entidad');
+            $table->uuid('registro_id')->nullable();
+            $table->enum('accion', ['INSERT', 'UPDATE', 'DELETE']);
+            $table->jsonb('datos_anteriores')->nullable();
+            $table->jsonb('datos_nuevos')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('auditoria');
+    }
+};
