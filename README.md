@@ -10,40 +10,52 @@ diaria, liquidaciones quincenales, control de adelantos y gestión de tienda.
 
 ## Stack Tecnológico
 
-- **Frontend:** React + TypeScript + Vite + TailwindCSS
-- **Backend:** Node.js + Express + TypeScript
-- **Base de datos:** PostgreSQL + Prisma ORM
-- **Despliegue:** Vercel (frontend) + Render (backend) + Neon (BD)
+- **Frontend:** Angular + TypeScript
+- **Backend:** PHP + Laravel (API REST) + JWT (tymon/jwt-auth)
+- **Base de datos:** PostgreSQL + Eloquent ORM
+- **Despliegue:** Neon (BD) + Docker Compose (backend/frontend en desarrollo)
 
 ## Módulos
 
+- Autenticación y roles (Administrador, Presidente, Recepcionista, Encargado de tienda)
 - Gestión de socios
 - Registro de leche por jornada
 - Quincenas y liquidaciones automáticas
 - Control de adelantos
 - Tienda (ventas y fiados)
+- Gastos operativos
 - Reportes administrativos
 
 ## Instalación local
 
 ### Requisitos previos
-- Node.js 20+
-- Docker y Docker Compose
+- Docker y Docker Compose (no se requiere PHP ni Composer instalados localmente)
+- Node.js 20+ (para el frontend Angular)
 
-### Pasos
+### Backend (Laravel)
 
 ```bash
-# Clonar el repositorio
-git clone https://github.com/JohnAlex2023/agrolact.git
-cd agrolact
-
-# Instalar dependencias del backend
 cd backend
-npm install
+cp .env.example .env
+# completa DB_HOST, DB_USERNAME, DB_PASSWORD (Neon) y JWT_SECRET en .env
 
-# Instalar dependencias del frontend
-cd ../frontend
+# Construir la imagen de desarrollo
+docker compose -f ../docker-compose.dev.yml build
+
+# Instalar dependencias, migrar y sembrar datos de prueba
+docker compose -f ../docker-compose.dev.yml run --rm backend composer install
+docker compose -f ../docker-compose.dev.yml run --rm backend php artisan migrate --seed
+
+# Levantar el servidor (http://localhost:8000)
+docker compose -f ../docker-compose.dev.yml up backend
+```
+
+### Frontend (Angular)
+
+```bash
+cd frontend
 npm install
+npm start
 ```
 
 ## Estructura del proyecto
