@@ -41,6 +41,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/quincenas/{quincena}/liquidaciones', [QuincenaController::class, 'liquidaciones']);
 
         Route::post('/gastos-operativos', [GastoOperativoController::class, 'store']);
+        Route::get('/gastos-operativos/actual', [GastoOperativoController::class, 'delaActual']);
 
         Route::post('/adelantos', [AdelantoController::class, 'store']);
         Route::get('/socios/{socio}/adelantos-pendientes', [AdelantoController::class, 'pendientesPorSocio']);

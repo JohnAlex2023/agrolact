@@ -6,6 +6,7 @@ use App\Exceptions\AppException;
 use App\Models\GastoOperativo;
 use App\Repositories\GastoOperativoRepository;
 use App\Repositories\QuincenaRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class GastoOperativoService
 {
@@ -27,5 +28,16 @@ class GastoOperativoService
             'quincena_id' => $quincena->id,
             'registrado_por' => $registradoPor,
         ]);
+    }
+
+    public function delaActual(): Collection
+    {
+        $quincena = $this->quincenas->abierta();
+
+        if (! $quincena) {
+            return new Collection();
+        }
+
+        return $this->gastos->porQuincena($quincena->id);
     }
 }

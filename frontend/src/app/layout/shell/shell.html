@@ -1,0 +1,25 @@
+<div class="shell">
+  <aside class="sidebar">
+    <h2>AgroLact</h2>
+    <nav>
+      @for (item of itemsNav; track item.ruta) {
+        <a [routerLink]="item.ruta" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: item.ruta === '/' }">
+          {{ item.etiqueta }}
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <div class="contenido">
+    <header>
+      @if (authService.usuario(); as usuario) {
+        <span class="usuario">{{ usuario.nombre }} &middot; {{ usuario.rol }}</span>
+      }
+      <button class="secundario" (click)="cerrarSesion()">Cerrar sesion</button>
+    </header>
+
+    <main>
+      <router-outlet />
+    </main>
+  </div>
+</div>
