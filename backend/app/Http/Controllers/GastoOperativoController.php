@@ -16,4 +16,9 @@ class GastoOperativoController extends Controller
 
         return response()->json(['status' => 'ok', 'data' => $gasto], 201);
     }
+
+    public function delaActual(): JsonResponse
+    {
+        return response()->json(['status' => 'ok', 'data' => $this->gastoOperativoService->delaActual()]);
+    }
 }

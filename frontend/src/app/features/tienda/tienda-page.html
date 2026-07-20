@@ -1,0 +1,126 @@
+<div class="page">
+  <h1>Tienda</h1>
+
+  @if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  }
+  @if (exito()) {
+    <p class="mensaje-ok">{{ exito() }}</p>
+  }
+
+  <form class="card" [formGroup]="formVenta" (ngSubmit)="registrarVenta()">
+    <h3>Registrar venta</h3>
+    <div class="grid-form">
+      <div class="field">
+        <label for="socio_id">Socio</label>
+        <select id="socio_id" formControlName="socio_id">
+          <option value="" disabled>Selecciona un socio</option>
+          @for (socio of socios(); track socio.id) {
+            <option [value]="socio.id">{{ socio.nombres }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="producto_id">Producto</label>
+        <select id="producto_id" formControlName="producto_id">
+          <option value="" disabled>Selecciona un producto</option>
+          @for (producto of productos(); track producto.id) {
+            <option [value]="producto.id">{{ producto.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="tipo">Tipo</label>
+        <select id="tipo" formControlName="tipo">
+          <option value="CONTADO">Contado</option>
+          <option value="FIADO">Fiado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cantidad">Cantidad</label>
+        <input id="cantidad" type="number" step="0.01" min="0.01" formControlName="cantidad" />
+      </div>
+      <div class="field">
+        <label for="precio_unitario">Precio unitario</label>
+        <input id="precio_unitario" type="number" step="0.01" min="0.01" formControlName="precio_unitario" />
+      </div>
+    </div>
+    <div class="toolbar" style="margin-top: 1rem; margin-bottom: 0; justify-content: flex-end;">
+      <button type="submit" [disabled]="guardandoVenta()">{{ guardandoVenta() ? 'Guardando...' : 'Registrar venta' }}</button>
+    </div>
+  </form>
+
+  <div class="card">
+    <h3>Productos</h3>
+
+    <form [formGroup]="formProducto" (ngSubmit)="crearProducto()" class="grid-form" style="max-width: 30rem; margin-bottom: 1.25rem;">
+      <div class="field">
+        <label for="nombre">Nombre del producto</label>
+        <input id="nombre" formControlName="nombre" />
+      </div>
+      <div class="field">
+        <label for="unidad_medida">Unidad de medida</label>
+        <input id="unidad_medida" formControlName="unidad_medida" placeholder="bulto, kg, unidad..." />
+      </div>
+      <button type="submit" [disabled]="guardandoProducto()">Agregar</button>
+    </form>
+
+    @if (productos().length === 0) {
+      <p class="vacio">No hay productos registrados.</p>
+    } @else {
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Unidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (producto of productos(); track producto.id) {
+            <tr>
+              <td>{{ producto.nombre }}</td>
+              <td>{{ producto.unidad_medida }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <div class="card">
+    <h3>Fiados pendientes por socio</h3>
+    <div class="field" style="max-width: 20rem;">
+      <select (change)="consultarFiados($any($event.target).value)">
+        <option value="">Selecciona un socio</option>
+        @for (socio of socios(); track socio.id) {
+          <option [value]="socio.id">{{ socio.nombres }}</option>
+        }
+      </select>
+    </div>
+
+    @if (socioConsultado()) {
+      @if (fiados().length === 0) {
+        <p class="vacio">Este socio no tiene fiados pendientes.</p>
+      } @else {
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (fiado of fiados(); track fiado.id) {
+              <tr>
+                <td>{{ fiado.producto?.nombre }}</td>
+                <td>{{ fiado.cantidad }}</td>
+                <td><span class="badge pendiente">{{ fiado.total }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="page">
+  <h1>Adelantos</h1>
+
+  <form class="card" [formGroup]="form" (ngSubmit)="registrar()">
+    <h3>Registrar adelanto</h3>
+
+    @if (error()) {
+      <p class="mensaje-error">{{ error() }}</p>
+    }
+    @if (exito()) {
+      <p class="mensaje-ok">{{ exito() }}</p>
+    }
+
+    <div class="grid-form">
+      <div class="field">
+        <label for="socio_id">Socio</label>
+        <select id="socio_id" formControlName="socio_id">
+          <option value="" disabled>Selecciona un socio</option>
+          @for (socio of socios(); track socio.id) {
+            <option [value]="socio.id">{{ socio.nombres }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="fecha">Fecha</label>
+        <input id="fecha" type="date" formControlName="fecha" />
+      </div>
+      <div class="field">
+        <label for="valor">Valor</label>
+        <input id="valor" type="number" step="0.01" min="0.01" formControlName="valor" />
+      </div>
+      <div class="field">
+        <label for="abono_acordado">Abono acordado por quincena (opcional)</label>
+        <input id="abono_acordado" type="number" step="0.01" min="0" formControlName="abono_acordado" />
+      </div>
+      <div class="field">
+        <label for="observacion">Observacion</label>
+        <input id="observacion" formControlName="observacion" />
+      </div>
+    </div>
+
+    <div class="toolbar" style="margin-top: 1rem; margin-bottom: 0; justify-content: flex-end;">
+      <button type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando...' : 'Registrar' }}</button>
+    </div>
+  </form>
+
+  <div class="card">
+    <h3>Consultar adelantos pendientes por socio</h3>
+    <div class="field" style="max-width: 20rem;">
+      <select (change)="consultarPendientes($any($event.target).value)">
+        <option value="">Selecciona un socio</option>
+        @for (socio of socios(); track socio.id) {
+          <option [value]="socio.id">{{ socio.nombres }}</option>
+        }
+      </select>
+    </div>
+
+    @if (socioConsultado()) {
+      @if (pendientes().length === 0) {
+        <p class="vacio">Este socio no tiene adelantos pendientes.</p>
+      } @else {
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Valor</th>
+              <th>Abono acordado</th>
+              <th>Saldo restante</th>
+              <th>Observacion</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (adelanto of pendientes(); track adelanto.id) {
+              <tr>
+                <td>{{ adelanto.fecha | slice: 0:10 }}</td>
+                <td>{{ adelanto.valor }}</td>
+                <td>{{ adelanto.abono_acordado ?? '-' }}</td>
+                <td><span class="badge pendiente">{{ adelanto.saldo_restante }}</span></td>
+                <td>{{ adelanto.observacion ?? '-' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  </div>
+</div>

@@ -1,0 +1,88 @@
+<div class="page">
+  <div class="toolbar">
+    <h1>Socios</h1>
+    <button (click)="nuevoSocio()">Nuevo socio</button>
+  </div>
+
+  @if (mostrarFormulario()) {
+    <form class="card" [formGroup]="form" (ngSubmit)="guardar()">
+      <h3>{{ editando() ? 'Editar socio' : 'Nuevo socio' }}</h3>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="grid-form">
+        <div class="field">
+          <label for="nombres">Nombres</label>
+          <input id="nombres" formControlName="nombres" />
+        </div>
+        <div class="field">
+          <label for="cedula">Cedula</label>
+          <input id="cedula" formControlName="cedula" />
+        </div>
+        <div class="field">
+          <label for="celular">Celular</label>
+          <input id="celular" formControlName="celular" />
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-top: 1rem; margin-bottom: 0;">
+        <div></div>
+        <div style="display: flex; gap: 0.6rem;">
+          <button type="button" class="secundario" (click)="cancelar()">Cancelar</button>
+          <button type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando...' : 'Guardar' }}</button>
+        </div>
+      </div>
+    </form>
+  }
+
+  @if (historialSocio(); as socio) {
+    <div class="card">
+      <div class="toolbar">
+        <h3>Historial de {{ socio.nombres }}</h3>
+        <button class="secundario" (click)="cerrarHistorial()">Cerrar</button>
+      </div>
+      <p><strong>Registros de leche:</strong> {{ socio.registros_leche?.length ?? 0 }}</p>
+      <p><strong>Liquidaciones:</strong> {{ socio.liquidaciones?.length ?? 0 }}</p>
+    </div>
+  }
+
+  <div class="card">
+    @if (cargando()) {
+      <p class="vacio">Cargando...</p>
+    } @else if (socios().length === 0) {
+      <p class="vacio">No hay socios registrados todavia.</p>
+    } @else {
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Nombres</th>
+            <th>Cedula</th>
+            <th>Celular</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (socio of socios(); track socio.id) {
+            <tr>
+              <td>{{ socio.nombres }}</td>
+              <td>{{ socio.cedula }}</td>
+              <td>{{ socio.celular }}</td>
+              <td>
+                <span class="badge" [class.activa]="socio.activo" [class.cerrada]="!socio.activo">
+                  {{ socio.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td style="display: flex; gap: 0.5rem;">
+                <button class="secundario" (click)="verHistorial(socio)">Historial</button>
+                <button class="secundario" (click)="editar(socio)">Editar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

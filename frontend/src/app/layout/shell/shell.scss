@@ -1,0 +1,68 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 15rem;
+  background: #1f4620;
+  color: white;
+  padding: 1.5rem 1rem;
+  flex-shrink: 0;
+
+  h2 {
+    color: white;
+    margin: 0 0 1.5rem;
+    padding-left: 0.5rem;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  a {
+    color: #d7e6d7;
+    text-decoration: none;
+    padding: 0.6rem 0.75rem;
+    border-radius: 0.4rem;
+    font-size: 0.92rem;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &.activo {
+      background: #2f6d3a;
+      color: white;
+      font-weight: 600;
+    }
+  }
+}
+
+.contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 0.85rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e6e9e6;
+
+  .usuario {
+    font-size: 0.88rem;
+    color: #444;
+  }
+}
+
+main {
+  flex: 1;
+}
