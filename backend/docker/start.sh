@@ -12,8 +12,10 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Ejecutar migraciones automáticamente
-php artisan migrate --force
+# No ejecutar migraciones automáticamente en cada arranque.
+# Si la base de datos ya contiene tablas, esto puede causar errores de duplicado.
+# Ejecutar migraciones de forma manual o como paso de despliegue separado.
+# php artisan migrate --force
 
 # Iniciar PHP-FPM en background y Nginx en foreground
 php-fpm -D
