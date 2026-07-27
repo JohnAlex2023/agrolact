@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     git \
     nginx \
+    gettext-base \
     && docker-php-ext-install pdo pdo_pgsql \
     && rm -rf /var/lib/apt/lists/*
 
