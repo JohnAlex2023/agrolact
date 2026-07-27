@@ -4,37 +4,63 @@
 }
 
 .sidebar {
-  width: 15rem;
+  width: 15.5rem;
   background: #1f4620;
   color: white;
-  padding: 1.5rem 1rem;
+  padding: 1.25rem 1rem;
   flex-shrink: 0;
 
-  h2 {
-    color: white;
-    margin: 0 0 1.5rem;
-    padding-left: 0.5rem;
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0 0.4rem;
+    margin-bottom: 1.75rem;
+
+    h2 {
+      color: white;
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: 0.01em;
+    }
   }
 
   nav {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.15rem;
   }
 
   a {
-    color: #d7e6d7;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #cfe0cf;
     text-decoration: none;
-    padding: 0.6rem 0.75rem;
-    border-radius: 0.4rem;
-    font-size: 0.92rem;
+    padding: 0.58rem 0.75rem;
+    border-radius: 0.45rem;
+    font-size: 0.9rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    .icono-nav {
+      display: inline-flex;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+
+      svg {
+        width: 100%;
+        height: 100%;
+      }
+    }
 
     &:hover {
       background: rgba(255, 255, 255, 0.08);
+      color: white;
     }
 
     &.activo {
-      background: #2f6d3a;
+      background: #3a8a47;
       color: white;
       font-weight: 600;
     }
@@ -51,15 +77,47 @@
 header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 2rem;
+  padding: 0.7rem 2rem;
   background: white;
   border-bottom: 1px solid #e6e9e6;
 
-  .usuario {
-    font-size: 0.88rem;
-    color: #444;
+  .usuario-info {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.15rem;
+    height: 2.15rem;
+    border-radius: 50%;
+    background: #e3f0e3;
+    color: #1f4620;
+    font-weight: 700;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+  }
+
+  .datos-usuario {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+
+    strong {
+      font-size: 0.88rem;
+      color: #1f2a24;
+    }
+
+    small {
+      font-size: 0.74rem;
+      color: #7a877c;
+      letter-spacing: 0.02em;
+    }
   }
 }
 

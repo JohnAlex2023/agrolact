@@ -17,7 +17,7 @@ class StoreRegistroLecheRequest extends FormRequest
             'socio_id' => ['required', 'uuid', 'exists:socios,id'],
             'fecha' => ['required', 'date'],
             'jornada' => ['required', 'in:MANANA,TARDE'],
-            'litros' => ['required', 'numeric', 'min:0'],
+            'litros' => ['required', 'integer', 'min:0'],
         ];
     }
 }

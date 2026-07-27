@@ -1,0 +1,292 @@
+.selector-modo {
+  display: inline-flex;
+  border: 1px solid #d5dbd5;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  align-self: flex-start;
+
+  button {
+    background: white;
+    color: var(--ink-secondary);
+    border: none;
+    border-radius: 0;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+
+    &:hover {
+      background: #f3f6f3;
+    }
+
+    &.activo {
+      background: var(--brand);
+      color: white;
+    }
+  }
+}
+
+.periodo-quincena {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+  padding: 0.4rem 0;
+  display: inline-block;
+}
+
+.barra-grilla {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+
+  .campo-busqueda {
+    min-width: 14rem;
+  }
+}
+
+.resumen-grilla {
+  display: flex;
+  gap: 1.1rem;
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--ink-secondary);
+  padding-bottom: 0.55rem;
+
+  strong {
+    color: var(--ink-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .total-fuerte {
+    color: var(--brand-dark);
+    font-weight: 700;
+  }
+}
+
+.tip-teclado {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin: 0 0 0.9rem;
+
+  kbd {
+    background: #eef1ee;
+    border: 1px solid #d5dbd5;
+    border-radius: 0.25rem;
+    padding: 0.05rem 0.4rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+  }
+}
+
+.contenedor-grilla {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.tabla-grilla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #eef3ee;
+    color: #4c5a4e;
+    text-align: left;
+    padding: 0.65rem 0.9rem;
+    font-weight: 700;
+    border-bottom: 1px solid #dfe6df;
+  }
+
+  tbody tr:hover {
+    background: #fafcfa;
+  }
+
+  tbody td {
+    padding: 0.3rem 0.6rem;
+    border-bottom: 1px solid #eef1ee;
+  }
+
+  tfoot td {
+    padding: 0.65rem 0.9rem;
+    font-weight: 700;
+    background: #f3f6f3;
+    border-top: 2px solid #dfe6df;
+    color: var(--brand-dark);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .col-socio {
+    min-width: 13rem;
+    display: flex;
+    flex-direction: column;
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+
+    .nombre-socio {
+      font-weight: 600;
+      color: var(--ink-primary);
+    }
+
+    .cedula-socio {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+    }
+  }
+
+  .col-litros {
+    width: 8.5rem;
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .total-fila {
+    color: var(--ink-secondary);
+    font-weight: 600;
+  }
+}
+
+.celda {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 100%;
+    padding: 0.45rem 1.9rem 0.45rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 0.35rem;
+    font-size: 0.92rem;
+    font-family: inherit;
+    background: #fafbfa;
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--brand);
+      background: white;
+      box-shadow: 0 0 0 2px rgba(47, 109, 58, 0.12);
+    }
+
+    &::placeholder {
+      color: #c3c9c3;
+    }
+  }
+
+  .indicador {
+    position: absolute;
+    right: 0.55rem;
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    pointer-events: none;
+
+    &.ok {
+      color: var(--status-good);
+      font-weight: 700;
+    }
+
+    &.error {
+      color: var(--status-critical);
+      font-weight: 700;
+    }
+  }
+
+  &--error input {
+    border-color: var(--status-critical);
+    background: var(--status-critical-bg);
+  }
+
+  &--compacta input {
+    padding: 0.35rem 0.4rem;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+}
+
+/* ─── Vista de quincena completa: grilla ancha con columna fija ── */
+
+.tabla-quincena {
+  border-collapse: separate;
+  border-spacing: 0;
+
+  .col-socio {
+    min-width: 11rem;
+    max-width: 11rem;
+  }
+
+  .col-dia-header,
+  .col-subheader {
+    text-align: center !important;
+  }
+
+  .col-subheader {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.3rem !important;
+    background: #f3f6f3;
+    color: var(--ink-muted);
+  }
+
+  .col-litros-q {
+    width: 4.6rem;
+    min-width: 4.6rem;
+    padding: 0.2rem 0.25rem !important;
+  }
+
+  /* Bandas de color alternas para distinguir un dia del siguiente */
+  th.col-dia-header.dia-par,
+  th.col-subheader.dia-par {
+    background: #dcebdc;
+  }
+
+  td.col-litros-q.dia-par {
+    background: #f2f8f2;
+  }
+
+  tfoot td.col-litros-q.dia-par {
+    background: #e3efe3;
+  }
+
+  .col-total-socio {
+    min-width: 4.5rem;
+    text-align: center;
+    font-weight: 700;
+    color: var(--brand-dark);
+    background: #f7faf7;
+  }
+
+  .celda-esquina,
+  .celda-fija {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #eef3ee;
+  }
+
+  /* La celda-socio comparte clase con la vista diaria (display: flex),
+     pero aqui tiene rowspan="2"; flex rompe el calculo de alto con
+     rowspan, asi que se restaura el comportamiento normal de celda. */
+  .celda-esquina {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  tbody .celda-fija {
+    background: white;
+  }
+
+  tbody tr:hover .celda-fija {
+    background: #fafcfa;
+  }
+
+  .celda-esquina {
+    z-index: 3;
+  }
+
+  tfoot .celda-fija {
+    background: #f3f6f3;
+    z-index: 2;
+  }
+}

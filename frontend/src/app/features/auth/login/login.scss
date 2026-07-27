@@ -17,9 +17,17 @@
   background: #ffffff;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 
+  .marca {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
   h1 {
     margin: 0;
-    color: #2f6d3a;
+    color: #1f4620;
+    font-size: 1.5rem;
   }
 
   .subtitulo {
