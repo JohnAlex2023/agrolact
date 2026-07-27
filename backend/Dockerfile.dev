@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-COPY docker/nginx.conf /etc/nginx/sites-enabled/default
+COPY docker/nginx.conf /etc/nginx/nginx.conf.template
+RUN export PORT=8000 && envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
+
 COPY docker/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
@@ -20,4 +22,5 @@ WORKDIR /app
 
 EXPOSE 8000
 
-CMD ["/usr/local/bin/start.sh"]
+CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+
