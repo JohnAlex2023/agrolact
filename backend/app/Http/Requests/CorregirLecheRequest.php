@@ -14,7 +14,7 @@ class CorregirLecheRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'litros' => ['required', 'numeric', 'min:0'],
+            'litros' => ['required', 'integer', 'min:0'],
             'observacion' => ['required', 'string'],
         ];
     }

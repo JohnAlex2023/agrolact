@@ -1,82 +1,216 @@
-<div class="page">
-  <h1>Registro de leche</h1>
-  <p class="subtitulo">La quincena se asigna automaticamente segun la fecha.</p>
-
-  <form class="card" [formGroup]="form" (ngSubmit)="registrar()">
-    <h3>Registrar entrega</h3>
-
-    @if (error()) {
-      <p class="mensaje-error">{{ error() }}</p>
-    }
-    @if (exito()) {
-      <p class="mensaje-ok">{{ exito() }}</p>
-    }
-
-    <div class="grid-form">
-      <div class="field">
-        <label for="socio_id">Socio</label>
-        <select id="socio_id" formControlName="socio_id">
-          <option value="" disabled>Selecciona un socio</option>
-          @for (socio of socios(); track socio.id) {
-            <option [value]="socio.id">{{ socio.nombres }}</option>
-          }
-        </select>
-      </div>
-      <div class="field">
-        <label for="fecha">Fecha</label>
-        <input id="fecha" type="date" formControlName="fecha" />
-      </div>
-      <div class="field">
-        <label for="jornada">Jornada</label>
-        <select id="jornada" formControlName="jornada">
-          <option value="MANANA">Manana</option>
-          <option value="TARDE">Tarde</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="litros">Litros</label>
-        <input id="litros" type="number" step="0.01" min="0" formControlName="litros" />
-      </div>
+<div class="page pagina-grilla">
+  <div class="toolbar">
+    <div>
+      <h1>Registro de leche</h1>
+      <p class="subtitulo">Captura masiva tipo hoja de calculo &middot; la quincena se asigna automaticamente</p>
     </div>
-
-    <div class="toolbar" style="margin-top: 1rem; margin-bottom: 0; justify-content: flex-end;">
-      <button type="submit" [disabled]="guardando()">{{ guardando() ? 'Guardando...' : 'Registrar' }}</button>
+    <div class="selector-modo">
+      <button type="button" [class.activo]="modo() === 'dia'" (click)="cambiarModo('dia')">Vista diaria</button>
+      <button type="button" [class.activo]="modo() === 'quincena'" (click)="cambiarModo('quincena')">Quincena completa</button>
     </div>
-  </form>
-
-  <div class="card">
-    <div class="toolbar">
-      <h3>Registros del dia</h3>
-      <input
-        type="date"
-        [value]="fechaConsulta()"
-        (change)="cambiarFechaConsulta($any($event.target).value)"
-      />
-    </div>
-
-    @if (cargando()) {
-      <p class="vacio">Cargando...</p>
-    } @else if (registros().length === 0) {
-      <p class="vacio">No hay registros para esta fecha.</p>
-    } @else {
-      <table class="tabla">
-        <thead>
-          <tr>
-            <th>Socio</th>
-            <th>Jornada</th>
-            <th>Litros</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (registro of registros(); track registro.id) {
-            <tr>
-              <td>{{ registro.socio?.nombres }}</td>
-              <td>{{ registro.jornada === 'MANANA' ? 'Manana' : 'Tarde' }}</td>
-              <td>{{ registro.litros }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    }
   </div>
+
+  @if (quincenaActual() === null) {
+    <div class="mensaje-error">
+      No hay una quincena abierta.
+      @if (authService.tieneRol('ADMINISTRADOR', 'PRESIDENTE')) {
+        Ve a <a routerLink="/quincenas">Quincenas</a> para abrir una antes de registrar litros.
+      } @else {
+        Contacta a un administrador o presidente para que abra una.
+      }
+    </div>
+  } @else {
+    <div class="barra-grilla">
+      @if (modo() === 'dia') {
+        <div class="field">
+          <label for="fecha">Fecha</label>
+          <input
+            id="fecha"
+            type="date"
+            [value]="fecha()"
+            [min]="quincenaActual()?.fecha_inicio | slice: 0:10"
+            [max]="quincenaActual()?.fecha_fin | slice: 0:10"
+            (change)="cambiarFecha($any($event.target).value)"
+          />
+        </div>
+      } @else {
+        <div class="field">
+          <label>Periodo</label>
+          <span class="periodo-quincena">
+            {{ quincenaActual()?.fecha_inicio | slice: 0:10 }} &rarr; {{ quincenaActual()?.fecha_fin | slice: 0:10 }}
+          </span>
+        </div>
+      }
+      <div class="field campo-busqueda">
+        <label for="busqueda">Buscar socio</label>
+        <input
+          id="busqueda"
+          type="text"
+          placeholder="Nombre o cedula..."
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+      </div>
+
+      @if (modo() === 'dia') {
+        <div class="resumen-grilla">
+          <span><strong>{{ registrosGuardados() }}</strong> registros guardados</span>
+          <span><strong>{{ totalManana() }}</strong> L manana</span>
+          <span><strong>{{ totalTarde() }}</strong> L tarde</span>
+          <span class="total-fuerte"><strong>{{ totalGeneral() }}</strong> L total</span>
+        </div>
+      } @else {
+        <div class="resumen-grilla">
+          <span class="total-fuerte"><strong>{{ granTotalQuincena() }}</strong> L en la quincena</span>
+        </div>
+      }
+    </div>
+
+    <p class="tip-teclado">
+      Tip: escribe el valor y presiona <kbd>Enter</kbd> / <kbd>&darr;</kbd> / <kbd>&uarr;</kbd> / <kbd>&larr;</kbd> / <kbd>&rarr;</kbd>
+      para moverte entre celdas &middot; pega una columna copiada desde Excel.
+    </p>
+
+    <div class="card contenedor-grilla">
+      @if (cargando()) {
+        <p class="vacio">Cargando...</p>
+      } @else if (modo() === 'dia') {
+        @if (filasFiltradas().length === 0) {
+          <p class="vacio">No se encontraron socios.</p>
+        } @else {
+          <table class="tabla-grilla">
+            <thead>
+              <tr>
+                <th class="col-socio">Socio</th>
+                <th class="col-litros">Manana (L)</th>
+                <th class="col-litros">Tarde (L)</th>
+                <th class="col-litros">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of filasFiltradas(); track fila.socio.id; let i = $index) {
+                <tr>
+                  <td class="col-socio">
+                    <span class="nombre-socio">{{ fila.socio.nombres }}</span>
+                    <span class="cedula-socio">{{ fila.socio.cedula }}</span>
+                  </td>
+                  <td class="col-litros">
+                    <div class="celda" [class.celda--guardando]="fila.manana.estado === 'guardando'" [class.celda--guardado]="fila.manana.estado === 'guardado'" [class.celda--error]="fila.manana.estado === 'error'">
+                      <input
+                        [id]="'celda-manana-' + i"
+                        type="number" step="1" min="0" inputmode="numeric"
+                        [value]="fila.manana.litros ?? ''"
+                        (blur)="onBlur(fila, 'manana', $event)"
+                        (keydown)="onKeydown($event, i, 'manana')"
+                        (paste)="onPaste($event, i, 'manana')"
+                        [title]="fila.manana.mensajeError ?? ''"
+                      />
+                      @if (fila.manana.estado === 'guardando') { <span class="indicador">&hellip;</span> }
+                      @if (fila.manana.estado === 'guardado') { <span class="indicador ok">&check;</span> }
+                      @if (fila.manana.estado === 'error') { <span class="indicador error">&#33;</span> }
+                    </div>
+                  </td>
+                  <td class="col-litros">
+                    <div class="celda" [class.celda--guardando]="fila.tarde.estado === 'guardando'" [class.celda--guardado]="fila.tarde.estado === 'guardado'" [class.celda--error]="fila.tarde.estado === 'error'">
+                      <input
+                        [id]="'celda-tarde-' + i"
+                        type="number" step="1" min="0" inputmode="numeric"
+                        [value]="fila.tarde.litros ?? ''"
+                        (blur)="onBlur(fila, 'tarde', $event)"
+                        (keydown)="onKeydown($event, i, 'tarde')"
+                        (paste)="onPaste($event, i, 'tarde')"
+                        [title]="fila.tarde.mensajeError ?? ''"
+                      />
+                      @if (fila.tarde.estado === 'guardando') { <span class="indicador">&hellip;</span> }
+                      @if (fila.tarde.estado === 'guardado') { <span class="indicador ok">&check;</span> }
+                      @if (fila.tarde.estado === 'error') { <span class="indicador error">&#33;</span> }
+                    </div>
+                  </td>
+                  <td class="col-litros total-fila">{{ (fila.manana.litros ?? 0) + (fila.tarde.litros ?? 0) }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <td class="col-socio">Total</td>
+                <td class="col-litros">{{ totalManana() }}</td>
+                <td class="col-litros">{{ totalTarde() }}</td>
+                <td class="col-litros">{{ totalGeneral() }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        }
+      } @else {
+        @if (filasQuincenaFiltradas().length === 0) {
+          <p class="vacio">No se encontraron socios.</p>
+        } @else {
+          <table class="tabla-grilla tabla-quincena">
+            <thead>
+              <tr>
+                <th class="col-socio celda-esquina" rowspan="2">Socio</th>
+                @for (dia of diasQuincena(); track dia; let jh = $index) {
+                  <th class="col-dia-header" [class.dia-par]="jh % 2 === 0" colspan="2">{{ formatearDia(dia) }}</th>
+                }
+                <th class="col-total-socio" rowspan="2">Total</th>
+              </tr>
+              <tr>
+                @for (dia of diasQuincena(); track dia; let jh = $index) {
+                  <th class="col-subheader" [class.dia-par]="jh % 2 === 0">M</th>
+                  <th class="col-subheader" [class.dia-par]="jh % 2 === 0">T</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of filasQuincenaFiltradas(); track fila.socio.id; let i = $index) {
+                <tr>
+                  <td class="col-socio celda-fija">
+                    <span class="nombre-socio">{{ fila.socio.nombres }}</span>
+                    <span class="cedula-socio">{{ fila.socio.cedula }}</span>
+                  </td>
+                  @for (dia of diasQuincena(); track dia; let j = $index) {
+                    <td class="col-litros-q" [class.dia-par]="j % 2 === 0">
+                      <div class="celda celda--compacta" [class.celda--guardando]="fila.dias[dia].manana.estado === 'guardando'" [class.celda--guardado]="fila.dias[dia].manana.estado === 'guardado'" [class.celda--error]="fila.dias[dia].manana.estado === 'error'">
+                        <input
+                          [id]="'qcelda-manana-' + i + '-' + j"
+                          type="number" step="1" min="0" inputmode="numeric"
+                          [value]="fila.dias[dia].manana.litros ?? ''"
+                          (blur)="onBlurQuincena(fila, dia, 'manana', $event)"
+                          (keydown)="onKeydownQuincena($event, i, j, 'manana')"
+                          (paste)="onPasteQuincena($event, i, j, 'manana')"
+                          [title]="fila.dias[dia].manana.mensajeError ?? ''"
+                        />
+                      </div>
+                    </td>
+                    <td class="col-litros-q" [class.dia-par]="j % 2 === 0">
+                      <div class="celda celda--compacta" [class.celda--guardando]="fila.dias[dia].tarde.estado === 'guardando'" [class.celda--guardado]="fila.dias[dia].tarde.estado === 'guardado'" [class.celda--error]="fila.dias[dia].tarde.estado === 'error'">
+                        <input
+                          [id]="'qcelda-tarde-' + i + '-' + j"
+                          type="number" step="1" min="0" inputmode="numeric"
+                          [value]="fila.dias[dia].tarde.litros ?? ''"
+                          (blur)="onBlurQuincena(fila, dia, 'tarde', $event)"
+                          (keydown)="onKeydownQuincena($event, i, j, 'tarde')"
+                          (paste)="onPasteQuincena($event, i, j, 'tarde')"
+                          [title]="fila.dias[dia].tarde.mensajeError ?? ''"
+                        />
+                      </div>
+                    </td>
+                  }
+                  <td class="col-total-socio">{{ totalPorSocio(fila) }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <td class="col-socio celda-fija">Total</td>
+                @for (dia of diasQuincena(); track dia; let jh = $index) {
+                  <td class="col-litros-q" [class.dia-par]="jh % 2 === 0" colspan="2">{{ sumaDia(dia) }}</td>
+                }
+                <td class="col-total-socio">{{ granTotalQuincena() }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        }
+      }
+    </div>
+  }
 </div>

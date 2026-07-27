@@ -20,6 +20,11 @@ class RegistroLecheRepository
         return RegistroLeche::with('socio')->where('fecha', $fecha)->get();
     }
 
+    public function porQuincena(string $quincenaId): Collection
+    {
+        return RegistroLeche::where('quincena_id', $quincenaId)->get();
+    }
+
     public function historialPorSocio(string $socioId): Collection
     {
         return RegistroLeche::where('socio_id', $socioId)->orderByDesc('fecha')->get();

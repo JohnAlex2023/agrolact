@@ -1,9 +1,128 @@
 <div class="page">
   @if (authService.usuario(); as usuario) {
-    <h1>Bienvenido, {{ usuario.nombre }}</h1>
-    <p class="subtitulo">Sistema de gestion de AgroLact &middot; rol: {{ usuario.rol }}</p>
+    <h1>Bienvenido, {{ usuario.nombre.split(' ')[0] }}</h1>
+    <p class="subtitulo" style="text-transform: capitalize;">{{ hoy }} &middot; rol: {{ usuario.rol }}</p>
   }
+
+  <div class="stat-grid">
+    <!-- Quincena actual: visible para todos los roles -->
+    @if (quincena() === undefined) {
+      <div class="stat-tile estado-muted">
+        <span class="stat-tile__icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </span>
+        <span class="stat-tile__cuerpo">
+          <span class="stat-tile__label">Quincena actual</span>
+          <span class="stat-tile__valor">...</span>
+        </span>
+      </div>
+    } @else if (quincena(); as q) {
+      <div class="stat-tile" [class.estado-good]="!!q.precio_litro" [class.estado-warning]="!q.precio_litro">
+        <span class="stat-tile__icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </span>
+        <span class="stat-tile__cuerpo">
+          <span class="stat-tile__label">Quincena actual</span>
+          <span class="stat-tile__valor">Abierta</span>
+          <span class="stat-tile__nota">
+            {{ q.precio_litro ? ('Precio: ' + q.precio_litro + ' / litro') : 'Falta definir el precio' }}
+          </span>
+        </span>
+      </div>
+    } @else {
+      <div class="stat-tile estado-muted">
+        <span class="stat-tile__icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </span>
+        <span class="stat-tile__cuerpo">
+          <span class="stat-tile__label">Quincena actual</span>
+          <span class="stat-tile__valor">Sin abrir</span>
+        </span>
+      </div>
+    }
+
+    <!-- Socios activos: ADMINISTRADOR, PRESIDENTE -->
+    @if (authService.tieneRol('ADMINISTRADOR', 'PRESIDENTE')) {
+      <div class="stat-tile">
+        <span class="stat-tile__icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </span>
+        <span class="stat-tile__cuerpo">
+          <span class="stat-tile__label">Socios activos</span>
+          <span class="stat-tile__valor">{{ sociosActivos() ?? '...' }}</span>
+        </span>
+      </div>
+    }
+
+    <!-- Litros hoy: ADMINISTRADOR, PRESIDENTE, RECEPCIONISTA -->
+    @if (authService.tieneRol('ADMINISTRADOR', 'PRESIDENTE', 'RECEPCIONISTA')) {
+      <div class="stat-tile">
+        <span class="stat-tile__icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+        </span>
+        <span class="stat-tile__cuerpo">
+          <span class="stat-tile__label">Litros de hoy</span>
+          <span class="stat-tile__valor">{{ litrosHoy() ?? '...' }}</span>
+        </span>
+      </div>
+    }
+
+    <!-- Adelantos pendientes: ADMINISTRADOR, PRESIDENTE -->
+    @if (authService.tieneRol('ADMINISTRADOR', 'PRESIDENTE')) {
+      <div class="stat-tile" [class.estado-good]="adelantosPendientes() === 0" [class.estado-warning]="(adelantosPendientes() ?? 0) > 0">
+        <span class="stat-tile__icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </span>
+        <span class="stat-tile__cuerpo">
+          <span class="stat-tile__label">Adelantos pendientes</span>
+          <span class="stat-tile__valor">{{ adelantosPendientes() ?? '...' }}</span>
+        </span>
+      </div>
+    }
+
+    <!-- Fiados pendientes: ADMINISTRADOR, ENCARGADO_TIENDA -->
+    @if (authService.tieneRol('ADMINISTRADOR', 'ENCARGADO_TIENDA')) {
+      <div class="stat-tile" [class.estado-good]="fiadosPendientes() === 0" [class.estado-warning]="(fiadosPendientes() ?? 0) > 0">
+        <span class="stat-tile__icono">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        </span>
+        <span class="stat-tile__cuerpo">
+          <span class="stat-tile__label">Fiados pendientes</span>
+          <span class="stat-tile__valor">{{ fiadosPendientes() ?? '...' }}</span>
+        </span>
+      </div>
+    }
+  </div>
+
   <div class="card">
-    <p>Usa el menu de la izquierda para navegar entre los modulos del sistema.</p>
+    <h3>Accesos rapidos</h3>
+    <div class="acciones-rapidas">
+      @if (authService.tieneRol('ADMINISTRADOR', 'PRESIDENTE', 'RECEPCIONISTA')) {
+        <a class="accion-rapida" routerLink="/leche">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          Registrar litros
+        </a>
+      }
+      @if (authService.tieneRol('ADMINISTRADOR', 'PRESIDENTE')) {
+        <a class="accion-rapida" routerLink="/quincenas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          Gestionar quincena
+        </a>
+        <a class="accion-rapida" routerLink="/adelantos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          Registrar adelanto
+        </a>
+        <a class="accion-rapida" routerLink="/reportes">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          Ver reportes
+        </a>
+      }
+      @if (authService.tieneRol('ADMINISTRADOR', 'ENCARGADO_TIENDA')) {
+        <a class="accion-rapida" routerLink="/tienda">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          Registrar venta
+        </a>
+      }
+    </div>
   </div>
 </div>

@@ -29,4 +29,10 @@ export class LecheService {
       .get<ApiResponse<RegistroLeche[]>>(`${API_URL}/socios/${socioId}/registros-leche`)
       .pipe(map((r) => r.data));
   }
+
+  porQuincena(quincenaId: string): Observable<RegistroLeche[]> {
+    return this.http
+      .get<ApiResponse<RegistroLeche[]>>(`${API_URL}/quincenas/${quincenaId}/registros-leche`)
+      .pipe(map((r) => r.data));
+  }
 }

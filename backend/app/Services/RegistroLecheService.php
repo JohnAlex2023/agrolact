@@ -46,6 +46,11 @@ class RegistroLecheService
         return $this->registros->delDia($fecha);
     }
 
+    public function porQuincena(string $quincenaId): Collection
+    {
+        return $this->registros->porQuincena($quincenaId);
+    }
+
     public function historialPorSocio(string $socioId): Collection
     {
         return $this->registros->historialPorSocio($socioId);
