@@ -31,6 +31,11 @@ class RegistroLecheController extends Controller
         return response()->json(['status' => 'ok', 'data' => $this->registroLecheService->historialPorSocio($socio)]);
     }
 
+    public function porQuincena(string $quincena): JsonResponse
+    {
+        return response()->json(['status' => 'ok', 'data' => $this->registroLecheService->porQuincena($quincena)]);
+    }
+
     public function corregir(CorregirLecheRequest $request, string $registro): JsonResponse
     {
         $actualizado = $this->registroLecheService->corregir(

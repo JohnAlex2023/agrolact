@@ -1,6 +1,9 @@
 <div class="login-page">
   <form class="login-card" [formGroup]="form" (ngSubmit)="enviar()">
-    <h1>AgroLact</h1>
+    <div class="marca">
+      <app-logo [size]="52" />
+      <h1>AgroLact</h1>
+    </div>
     <p class="subtitulo">Iniciar sesion</p>
 
     <label for="email">Correo electronico</label>
