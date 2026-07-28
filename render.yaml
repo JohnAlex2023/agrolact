@@ -17,7 +17,7 @@ services:
       - key: APP_KEY
         sync: false
       - key: APP_URL
-        value: https://agrolact-api.onrender.com
+        value: https://agrolact.onrender.com
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
