@@ -59,3 +59,18 @@ npm start
 ```
 
 ## Estructura del proyecto
+
+## Acceso público (demostración)
+
+Puedes acceder a las instancias públicas del proyecto usando los siguientes enlaces:
+
+- Frontend (app): https://agrolact.vercel.app
+- Backend (API): https://agrolact.onrender.com
+- Health endpoint: https://agrolact.onrender.com/api/health
+
+Credenciales de prueba (usuario público - solo para demo):
+
+- Usuario: demo@agrolact.test
+- Contraseña: Demo1234!
+
+Nota: Estas credenciales son públicas y solo para pruebas o demostraciones. No las uses en producción ni para datos reales.
