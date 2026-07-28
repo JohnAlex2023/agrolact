@@ -68,9 +68,9 @@ Puedes acceder a las instancias públicas del proyecto usando los siguientes enl
 - Backend (API): https://agrolact.onrender.com
 - Health endpoint: https://agrolact.onrender.com/api/health
 
-Credenciales de prueba (usuario público - solo para demo):
+Credenciales de prueba (administrador):
 
-- Usuario: demo@agrolact.test
-- Contraseña: Demo1234!
+- Usuario: admin@agrolact.com
+- Contraseña: admin123
 
 Nota: Estas credenciales son públicas y solo para pruebas o demostraciones. No las uses en producción ni para datos reales.
